@@ -60,7 +60,7 @@ class CreateRolesTable extends Migration
                 'updated_at' => date('Y-m-d H:i:s')
             ],
             [
-                'name' => 'staff',
+                'name' => 'officer',
                 'description' => 'เจ้าหน้าที่ทั่วไป',
                 'permission_level' => 3,
                 'created_at' => date('Y-m-d H:i:s'),
