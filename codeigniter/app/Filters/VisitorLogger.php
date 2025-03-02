@@ -20,23 +20,34 @@ class VisitorLogger implements FilterInterface
      * sent back to the client, allowing for error pages,
      * redirects, etc.
      *
-     * @param RequestInterface|IncomingRequest $request
+     * @param RequestInterface $request
      * @param array|null       $arguments
      *
-     * @return RequestInterface|ResponseInterface|IncomingRequest|string|void
+     * @return RequestInterface|ResponseInterface|string|void
      */
-    public function before(RequestInterface|IncomingRequest $request, $arguments = null)
+    public function before(RequestInterface $request, $arguments = null)
     {
         // ตรวจสอบว่าไม่ใช่การเรียกไฟล์ static เช่น CSS, JS, รูปภาพ
         $uri = $request->getUri()->getPath();
-        if (!preg_match('/\.(css|js|ico|png|jpg|jpeg|gif|svg)$/i', $uri)) {
+        if (!preg_match('/\.(css|js|ico|png|jpg|jpeg|gif|svg|csv|pdf)$/i', $uri)) {
             // ดึงข้อมูลผู้ใช้งาน
             $session = session();
             $userId = $session->get('user_id') ?? 0; // 0 สำหรับผู้ใช้ที่ไม่ได้ล็อกอิน
 
             // ดึงข้อมูลการเข้าชม
             $ipAddress = $request->getIPAddress();
-            $userAgent = $request->getUserAgent()->getAgentString();
+
+            // แปลง RequestInterface เป็น IncomingRequest เพื่อเรียกใช้ getUserAgent()
+            // โดยเช็คก่อนว่าเป็น instance ของ IncomingRequest หรือไม่
+            $userAgent = '';
+            if ($request instanceof IncomingRequest) {
+                $userAgent = $request->getUserAgent()->getAgentString();
+            } else {
+                // กรณีที่ไม่สามารถเข้าถึง getUserAgent() ได้
+                // อาจใช้ $_SERVER ซึ่งไม่ใช่วิธีที่แนะนำ แต่ใช้เป็น fallback ได้
+                $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+            }
+
             $page = $request->getUri()->getPath();
             $referrer = $request->getServer('HTTP_REFERER') ?? '';
 
