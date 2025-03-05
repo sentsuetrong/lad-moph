@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\VisitorLogModel;
+use Config\Services;
 
 class VisitorLogger implements FilterInterface
 {
@@ -30,37 +31,58 @@ class VisitorLogger implements FilterInterface
         // ตรวจสอบว่าไม่ใช่การเรียกไฟล์ static เช่น CSS, JS, รูปภาพ
         $uri = $request->getUri()->getPath();
         if (!preg_match('/\.(css|js|ico|png|jpg|jpeg|gif|svg|csv|pdf)$/i', $uri)) {
-            // ดึงข้อมูลผู้ใช้งาน
-            $session = session();
-            $userId = $session->get('user_id') ?? 0; // 0 สำหรับผู้ใช้ที่ไม่ได้ล็อกอิน
+            try {
+                // ใช้ DatabaseUtility Service เพื่อตรวจสอบตาราง
+                $dbUtility = Services::databaseUtility();
 
-            // ดึงข้อมูลการเข้าชม
-            $ipAddress = $request->getIPAddress();
+                // ตรวจสอบว่าฐานข้อมูลพร้อมใช้งานและตาราง visitor_logs มีอยู่หรือไม่
+                if ($dbUtility->isDatabaseReady() && $dbUtility->tableExists('visitor_logs')) {
+                    // ดึงข้อมูลผู้ใช้งาน
+                    $session = session();
+                    $userId = $session->get('user_id') ?? 0; // 0 สำหรับผู้ใช้ที่ไม่ได้ล็อกอิน
 
-            // แปลง RequestInterface เป็น IncomingRequest เพื่อเรียกใช้ getUserAgent()
-            // โดยเช็คก่อนว่าเป็น instance ของ IncomingRequest หรือไม่
-            $userAgent = '';
-            if ($request instanceof IncomingRequest) {
-                $userAgent = $request->getUserAgent()->getAgentString();
-            } else {
-                // กรณีที่ไม่สามารถเข้าถึง getUserAgent() ได้
-                // อาจใช้ $_SERVER ซึ่งไม่ใช่วิธีที่แนะนำ แต่ใช้เป็น fallback ได้
-                $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+                    // ดึงข้อมูลการเข้าชม
+                    $ipAddress = $request->getIPAddress();
+
+                    // แปลง RequestInterface เป็น IncomingRequest เพื่อเรียกใช้ getUserAgent()
+                    // โดยเช็คก่อนว่าเป็น instance ของ IncomingRequest หรือไม่
+                    $userAgent = '';
+                    if ($request instanceof IncomingRequest) {
+                        $userAgent = $request->getUserAgent()->getAgentString();
+                    } else {
+                        // กรณีที่ไม่สามารถเข้าถึง getUserAgent() ได้
+                        // อาจใช้ $_SERVER ซึ่งไม่ใช่วิธีที่แนะนำ แต่ใช้เป็น fallback ได้
+                        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+                    }
+
+                    $page = $request->getUri()->getPath();
+                    $referrer = $request->getServer('HTTP_REFERER') ?? '';
+
+                    // บันทึกลงฐานข้อมูล
+                    $visitorLogModel = new VisitorLogModel();
+                    $visitorLogModel->insert([
+                        'user_id'     => $userId,
+                        'ip_address'  => $ipAddress,
+                        'user_agent'  => $userAgent,
+                        'page'        => $page,
+                        'referrer'    => $referrer,
+                        'accessed_at' => date('Y-m-d H:i:s')
+                    ]);
+                }
+                // ถ้าตารางไม่มีอยู่ แต่เป็นการเข้าถึงหน้า migration
+                else if (strpos($uri, '/admin/migration') === 0) {
+                    // ไม่ต้องทำอะไร ปล่อยให้เข้าถึงหน้า migration ได้
+                    log_message('info', 'Accessing migration page with no tables: ' . $uri);
+                }
+                // ถ้าตารางไม่มีอยู่ และไม่ใช่หน้า migration
+                else {
+                    // อาจบันทึก log เพื่อติดตามการเข้าชมก่อนทำ migration
+                    log_message('info', 'Page access before migration: ' . $uri);
+                }
+            } catch (\Exception $e) {
+                // บันทึกข้อผิดพลาดแต่ไม่ทำให้เว็บล่ม
+                log_message('error', 'VisitorLogger exception: ' . $e->getMessage());
             }
-
-            $page = $request->getUri()->getPath();
-            $referrer = $request->getServer('HTTP_REFERER') ?? '';
-
-            // บันทึกลงฐานข้อมูล
-            $visitorLogModel = new VisitorLogModel();
-            $visitorLogModel->insert([
-                'user_id'     => $userId,
-                'ip_address'  => $ipAddress,
-                'user_agent'  => $userAgent,
-                'page'        => $page,
-                'referrer'    => $referrer,
-                'accessed_at' => date('Y-m-d H:i:s')
-            ]);
         }
 
         return $request;
@@ -80,6 +102,7 @@ class VisitorLogger implements FilterInterface
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        //
+        // ส่วนนี้ไม่ได้ใช้งานสำหรับการบันทึกผู้เข้าชม
+        return $response;
     }
 }

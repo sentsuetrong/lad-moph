@@ -3,6 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Config\BaseService;
+use App\Libraries\DatabaseUtility;
 
 /**
  * Services Configuration file.
@@ -16,6 +17,8 @@ use CodeIgniter\Config\BaseService;
  * that you might need. An example has been included with the general
  * method format you should use for your service methods. For more examples,
  * see the core Services file at system/Config/Services.php.
+ * 
+ * ลงทะเบียน Services ที่สร้างขึ้นเอง
  */
 class Services extends BaseService
 {
@@ -29,4 +32,20 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+
+    /**
+     * Service DatabaseUtility
+     *
+     * @param bool $getShared สร้าง instance ใหม่หรือใช้ instance ที่มีอยู่แล้ว
+     * @param string|null $group กลุ่มฐานข้อมูลที่ต้องการใช้
+     * @return DatabaseUtility
+     */
+    public static function databaseUtility(bool $getShared = true, ?string $group = null)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('databaseUtility', false, $group);
+        }
+
+        return new DatabaseUtility($group);
+    }
 }
