@@ -34,6 +34,8 @@ if (getcwd() . DIRECTORY_SEPARATOR !== FCPATH) {
     chdir(FCPATH);
 }
 
+// exit(die(var_dump([chdir(FCPATH), FCPATH])));
+
 /*
  *---------------------------------------------------------------
  * BOOTSTRAP THE APPLICATION
