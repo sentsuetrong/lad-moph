@@ -11,7 +11,7 @@ const mobileMenuOpen = ref(false)
       <div class="container mx-auto px-4 py-3">
         <div class="flex justify-between items-center">
           <div class="flex items-center">
-            <img src="./assets/vue.svg" alt="Logo" class="h-12 mr-3">
+            <img src="@/assets/vue.svg" alt="Logo" class="h-12 mr-3">
             <h1 class="text-xl font-bold">สำนักงานปลัดกระทรวงสาธารณสุข</h1>
           </div>
           <nav class="hidden md:flex space-x-4">

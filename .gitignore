@@ -129,3 +129,6 @@ nb-configuration.xml
 .github/
 
 node_modules/
+
+# built frontend for vue
+portal/frontend/*
