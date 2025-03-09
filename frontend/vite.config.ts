@@ -14,9 +14,27 @@ const logToFile = (message: string) => {
   fs.appendFileSync(debugFile, message + '\n', 'utf8')
 }
 
+// Plugin สำหรับลบโฟลเดอร์ก่อน build
+function cleanupPlugin() {
+  return {
+    name: 'cleanup-plugin',
+    buildStart() {
+      const frontendDir = resolve(__dirname, '../portal/frontend')
+      if (fs.existsSync(frontendDir)) {
+        console.log(`Cleaning up directory: ${frontendDir}`)
+        fs.rmSync(frontendDir, { recursive: true, force: true })
+      }
+    }
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    cleanupPlugin(),
+    vue(),
+    tailwindcss()
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src')
@@ -26,6 +44,7 @@ export default defineConfig({
     outDir: '../portal/frontend',
     emptyOutDir: true,
     manifest: true,
+    cssMinify: 'lightningcss',
     rollupOptions: {
       output: {
         assetFileNames: (assetInfo) => {
