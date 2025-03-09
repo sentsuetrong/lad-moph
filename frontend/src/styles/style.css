@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@import "./theme-variables.css";
+@import "./accessibility.css";
+@import "./layout.css";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-size: 100%;
+}
+
+/* ตรวจสอบการใช้งานในอุปกรณ์ที่มีความชอบให้แสดงผลแบบต่าง ๆ */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+  }
+
+  :root:not(.light):not(.dark) {
+    --color-background: #121212;
+    --color-text: rgba(255, 255, 255, 0.87);
+  }
+}
+
+/* Container styles เพื่อรองรับ responsive */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}

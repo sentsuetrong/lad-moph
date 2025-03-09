@@ -1,8 +1,9 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import axios from 'axios'
 import App from './App.vue'
 import router from './router'
-import './style.css'
+import './styles/style.css'
 
 // กำหนดค่าเริ่มต้น Axios สำหรับการเรียกใช้งาน API
 axios.defaults.baseURL = import.meta.env.VITE_API_URL || '/api'
@@ -21,8 +22,10 @@ axios.interceptors.request.use(config => {
 
 // สร้างแอปพลิเคชัน Vue
 const app = createApp(App);
+const pinia = createPinia()
 
 app.use(router);
+app.use(pinia)
 
 // สร้างตัวแปรสำหรับเรียกใช้ Axios ทั่วทั้งแอปพลิเคชัน
 app.config.globalProperties.$axios = axios;

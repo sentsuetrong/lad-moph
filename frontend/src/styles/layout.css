@@ -1,0 +1,344 @@
+/* layout.css - สไตล์สำหรับเลย์เอาท์หลักและคอมโพเนนต์ทั่วไป */
+
+/* องค์ประกอบพื้นฐาน */
+body {
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  transition: background-color var(--transition-speed) var(--transition-function),
+    color var(--transition-speed) var(--transition-function);
+}
+
+a {
+  font-weight: 500;
+  color: var(--color-link);
+  text-decoration: inherit;
+  transition: color var(--transition-speed) var(--transition-function);
+}
+
+a:hover {
+  color: var(--color-link-hover);
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--color-button-bg);
+  cursor: pointer;
+  transition: border-color var(--transition-speed) var(--transition-function),
+    background-color var(--transition-speed) var(--transition-function);
+}
+
+button:hover {
+  border-color: var(--color-button-border-hover);
+}
+
+h1 {
+  font-size: 2em;
+  line-height: 1.1;
+}
+
+#app {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* เฮดเดอร์และนำทาง */
+.bg-primary {
+  background-color: var(--color-primary);
+  color: var(--color-header-text);
+}
+
+.bg-accent {
+  background-color: var(--color-accent);
+  color: var(--color-footer-text);
+}
+
+/* แอนิเมชันโลโก้ */
+.logo-animation {
+  transition: transform 0.3s ease;
+}
+
+.logo-animation:hover {
+  transform: scale(1.1);
+}
+
+.agency-name {
+  background: linear-gradient(45deg, var(--color-primary-light), var(--color-secondary-light));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.dark .agency-name {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* เมนูนำทาง */
+.nav-link {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: var(--color-header-text);
+  font-weight: 500;
+  transition: background-color var(--transition-speed) var(--transition-function),
+    transform var(--transition-speed) var(--transition-function);
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  color: var(--color-header-text);
+}
+
+.nav-link.router-link-active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}
+
+.login-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-secondary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color var(--transition-speed) var(--transition-function),
+    transform var(--transition-speed) var(--transition-function);
+}
+
+.login-button:hover {
+  background-color: var(--color-secondary-light);
+  transform: translateY(-2px);
+  color: white;
+}
+
+.login-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ปุ่มแฮมเบอร์เกอร์ */
+.hamburger-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-header-text);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-speed) var(--transition-function);
+}
+
+.hamburger-button:hover,
+.hamburger-button:focus {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* เมนูมือถือ */
+.mobile-menu {
+  background-color: var(--color-primary-dark);
+  padding: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-link {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  color: var(--color-header-text);
+  transition: background-color var(--transition-speed) var(--transition-function);
+  text-decoration: none;
+}
+
+.mobile-link:hover,
+.mobile-link:focus {
+  background-color: var(--color-primary);
+  color: var(--color-header-text);
+}
+
+.mobile-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+}
+
+.mobile-login {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: var(--color-secondary);
+  color: white;
+  transition: background-color var(--transition-speed) var(--transition-function);
+  text-decoration: none;
+}
+
+.mobile-login:hover,
+.mobile-login:focus {
+  background-color: var(--color-secondary-light);
+  color: white;
+}
+
+/* ฟุตเตอร์ */
+.footer-section {
+  margin-bottom: 24px;
+}
+
+.footer-heading {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-bottom: 16px;
+  position: relative;
+  display: inline-block;
+}
+
+.footer-heading:after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background-color: var(--color-secondary);
+  border-radius: 3px;
+}
+
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.footer-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color var(--transition-speed) var(--transition-function);
+}
+
+.footer-link:hover {
+  color: var(--color-secondary);
+}
+
+.footer-link-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.social-links {
+  display: flex;
+  gap: 12px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color var(--transition-speed) var(--transition-function),
+    transform var(--transition-speed) var(--transition-function);
+}
+
+.social-link:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-3px);
+}
+
+.social-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-footer-text);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 24px;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .footer-bottom {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.copyright {
+  font-size: 0.9em;
+  margin: 0;
+}
+
+.footer-policy-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-policy-link {
+  font-size: 0.9em;
+  transition: color var(--transition-speed) var(--transition-function);
+}
+
+.footer-policy-link:hover {
+  color: var(--color-secondary);
+}
+
+.separator {
+  opacity: 0.5;
+}

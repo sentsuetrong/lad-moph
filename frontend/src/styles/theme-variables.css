@@ -1,0 +1,179 @@
+/* theme-variables.css - ตัวแปร CSS สำหรับธีมต่างๆ */
+
+/* ตัวแปรสีต่างๆ สำหรับ light mode (ค่าเริ่มต้น) */
+:root {
+  /* สีหลัก */
+  --color-background: #f8f9fa;
+  --color-text: #333333;
+  --color-primary: #006838;
+  --color-primary-light: #008a4c;
+  --color-primary-dark: #004d2a;
+  --color-secondary: #f7941d;
+  --color-secondary-light: #ffaa33;
+  --color-secondary-dark: #e07c00;
+  --color-accent: #00539b;
+  --color-accent-light: #1976d2;
+  --color-accent-dark: #003b6f;
+
+  /* สีลิงก์ */
+  --color-link: #006838;
+  --color-link-hover: #f7941d;
+
+  /* สีองค์ประกอบ UI */
+  --color-button-bg: #ffffff;
+  --color-button-border: #e2e8f0;
+  --color-button-border-hover: #006838;
+  --color-input-bg: #ffffff;
+  --color-input-border: #e2e8f0;
+  --color-input-focus: #006838;
+  --color-card-bg: #ffffff;
+  --color-card-border: #e2e8f0;
+  --color-divider: #e2e8f0;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+
+  /* สีข้อความพิเศษ */
+  --color-header-text: #ffffff;
+  --color-footer-text: #ffffff;
+
+  /* ตัวแปรอนิเมชัน */
+  --transition-speed: 0.25s;
+  --transition-function: ease;
+
+  /* คุณสมบัติเพิ่มเติม */
+  color-scheme: light;
+  color: var(--color-text);
+  background-color: var(--color-background);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* โหมดมืด */
+.dark {
+  /* สีหลัก */
+  --color-background: #121212;
+  --color-text: rgba(255, 255, 255, 0.87);
+  --color-primary: #2e9e6a;
+  --color-primary-light: #4eca8b;
+  --color-primary-dark: #1e784a;
+  --color-secondary: #ffa940;
+  --color-secondary-light: #ffc069;
+  --color-secondary-dark: #fa8c16;
+  --color-accent: #4a89dc;
+  --color-accent-light: #73a7e9;
+  --color-accent-dark: #2a6bc2;
+
+  /* สีลิงก์ */
+  --color-link: #2e9e6a;
+  --color-link-hover: #ffa940;
+
+  /* สีองค์ประกอบ UI */
+  --color-button-bg: #2a2a2a;
+  --color-button-border: #3a3a3a;
+  --color-button-border-hover: #2e9e6a;
+  --color-input-bg: #2a2a2a;
+  --color-input-border: #3a3a3a;
+  --color-input-focus: #2e9e6a;
+  --color-card-bg: #1e1e1e;
+  --color-card-border: #3a3a3a;
+  --color-divider: #3a3a3a;
+  --color-shadow: rgba(0, 0, 0, 0.3);
+
+  /* สีข้อความพิเศษ */
+  --color-header-text: rgba(255, 255, 255, 0.87);
+  --color-footer-text: rgba(255, 255, 255, 0.87);
+
+  color-scheme: dark;
+}
+
+/* คอนทราสต์สูง - โหมดสว่าง */
+.high-contrast {
+  /* สีหลัก */
+  --color-background: #ffffff;
+  --color-text: #000000;
+  --color-primary: #006000;
+  --color-primary-light: #008000;
+  --color-primary-dark: #004000;
+  --color-secondary: #c04000;
+  --color-secondary-light: #e05000;
+  --color-secondary-dark: #a03000;
+  --color-accent: #0000c0;
+  --color-accent-light: #0000e0;
+  --color-accent-dark: #0000a0;
+
+  /* สีลิงก์ */
+  --color-link: #006000;
+  --color-link-hover: #c04000;
+
+  /* สีองค์ประกอบ UI */
+  --color-button-bg: #ffffff;
+  --color-button-border: #000000;
+  --color-button-border-hover: #006000;
+  --color-input-bg: #ffffff;
+  --color-input-border: #000000;
+  --color-input-focus: #006000;
+  --color-card-bg: #ffffff;
+  --color-card-border: #000000;
+  --color-divider: #000000;
+  --color-shadow: rgba(0, 0, 0, 0.5);
+
+  /* สีข้อความพิเศษ */
+  --color-header-text: #ffffff;
+  --color-footer-text: #ffffff;
+}
+
+/* คอนทราสต์สูง - โหมดมืด */
+.dark.high-contrast {
+  /* สีหลัก */
+  --color-background: #000000;
+  --color-text: #ffffff;
+  --color-primary: #00ff00;
+  --color-primary-light: #66ff66;
+  --color-primary-dark: #00cc00;
+  --color-secondary: #ff8000;
+  --color-secondary-light: #ffa64d;
+  --color-secondary-dark: #cc6600;
+  --color-accent: #00ffff;
+  --color-accent-light: #80ffff;
+  --color-accent-dark: #00cccc;
+
+  /* สีลิงก์ */
+  --color-link: #00ff00;
+  --color-link-hover: #ff8000;
+
+  /* สีองค์ประกอบ UI */
+  --color-button-bg: #404040;
+  --color-button-border: #ffffff;
+  --color-button-border-hover: #00ff00;
+  --color-input-bg: #404040;
+  --color-input-border: #ffffff;
+  --color-input-focus: #00ff00;
+  --color-card-bg: #404040;
+  --color-card-border: #ffffff;
+  --color-divider: #ffffff;
+  --color-shadow: rgba(255, 255, 255, 0.5);
+
+  /* สีข้อความพิเศษ */
+  --color-header-text: #ffffff;
+  --color-footer-text: #ffffff;
+}
+
+/* เรียกใช้งานสไตล์สำหรับคลาสพิเศษสำหรับ Tailwind */
+.card {
+  padding: 2em;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px var(--color-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.reduced-motion-disabled) * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
