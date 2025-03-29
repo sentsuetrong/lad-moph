@@ -6,16 +6,29 @@ const mobileMenuOpen = ref(false)
 </script>
 
 <template>
-  <div class="sticky top-0 bg-white z-50">
-    <div class="container mx-auto py-4">
+  <div class="w-full bg-emerald-600 border-t-2 border-emerald-500">
+    <div class="container max-w-7xl mx-auto px-4 py-1 flex justify-between items-center">
+      <span class="text-xs text-emerald-950 truncate">ตึกสำนักงานปลัดกระทรวงสาธารณสุข อาคาร 6 ชั้น 3
+        ซอยติวานนท์ ถนนติวานนท์
+        ตำบลตลาดขวัญ อำเภอเมือง จังหวัดนนทบุรี 11000
+      </span>
+      <a href="#"
+        class=" min-w-max text-xs text-emerald-950 hover:text-black pl-4 lg:px-4 rounded block transition-colors"><i
+          class="fi fi-rr-sign-in-alt mr-2 align-middle"></i>สำหรับเจ้าหน้าที่</a>
+    </div>
+  </div>
+  <div class="sticky top-0 bg-white/80 backdrop-blur-md z-50">
+    <div class="container max-w-7xl mx-auto px-4 py-2">
       <div class="flex flex-col lg:flex-row justify-between items-center">
-        <div class="w-full lg:w-fit px-4 lg:px-0 flex justify-between gap-x-4">
+        <div class="w-full lg:w-fit flex justify-between gap-x-4">
           <router-view to="/">
             <div class="flex justify-center items-center select-none">
               <img src="/src/assets/vue.svg" alt="Logo" class="h-12 mr-3 logo-animation" draggable="false">
-              <div class="min-w-fit text-emerald-800 font-bold flex flex-col-reverse">
-                <h1 class="text-xl">กองกฎหมาย</h1>
-                <p class="text-sm">สำนักงานปลัดกระทรวงสาธารณสุข</p>
+              <div class="min-w-fit text-emerald-800 font-bold flex flex-col-reverse"
+                alt="กองกฎหมาย สำนักงานปลัดกระทรวงสาธารณสุข">
+                <h1 alt="Legal Affairs Divisions">กองกฎหมาย</h1>
+                <p class="text-sm" alt="Office of the Permanent Secretary, Ministry of Publich Health">
+                  สำนักงานปลัดกระทรวงสาธารณสุข</p>
               </div>
             </div>
           </router-view>
@@ -25,7 +38,8 @@ const mobileMenuOpen = ref(false)
           </button>
         </div>
 
-        <nav class="w-full lg:w-auto lg:flex" :class="mobileMenuOpen ? 'pt-4 block' : 'hidden'">
+        <nav class="w-full lg:w-auto bg-gray-50 lg:bg-transparent mt-4 lg:mt-0 lg:flex"
+          :class="mobileMenuOpen ? 'block' : 'hidden'">
           <ul class="flex flex-col lg:flex-row lg:items-center">
             <ul class="flex flex-col lg:flex-row lg:items-center">
               <li class="min-w-fit">
@@ -40,17 +54,11 @@ const mobileMenuOpen = ref(false)
               </li>
               <li class="min-w-fit"><a href="#"
                   class="text-gray-500 hover:text-emerald-600 px-4 py-2 rounded block transition-colors"><i
-                    class="fas fa-info-circle mr-2"></i>เกี่ยวกับเรา</a></li>
+                    class="fi fi-rr-rectangle-list mr-2 align-middle"></i>บริการ<i
+                    class="fi fi-rr-angle-small-down ml-1 align-middle"></i></a></li>
               <li class="min-w-fit"><a href="#"
                   class="text-gray-500 hover:text-emerald-600 px-4 py-2 rounded block transition-colors"><i
-                    class="fas fa-chart-bar mr-2"></i>บริการ</a></li>
-              <li class="min-w-fit"><a href="#"
-                  class="text-gray-500 hover:text-emerald-600 px-4 py-2 rounded block transition-colors">
-                  <i class="fi fi-rr-envelope mr-2 align-middle"></i>
-                  ติดต่อเรา</a></li>
-              <li class="min-w-fit"><a href="#"
-                  class="text-gray-500 hover:text-emerald-600 px-4 py-2 rounded block transition-colors"><i
-                    class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบ</a></li>
+                    class="fi fi-rr-envelope mr-2 align-middle"></i>ติดต่อเรา</a></li>
             </ul>
           </ul>
         </nav>
@@ -58,11 +66,13 @@ const mobileMenuOpen = ref(false)
     </div>
   </div>
 
-  <h1 class="text-6xl text-emerald-500">Hello world</h1>
+  <main class="container mx-auto">
+    <h1 class="text-6xl text-emerald-500">Hello world</h1>
 
-  <div class="card">
-    <h2 class="text-emerald-500">Card</h2>
-  </div>
+    <div class="card">
+      <h2 class="text-emerald-500">Card</h2>
+    </div>
+  </main>
 
   <router-view />
 </template>
