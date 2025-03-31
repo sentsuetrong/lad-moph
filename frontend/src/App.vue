@@ -2,28 +2,19 @@
 import { ref } from 'vue';
 import { RouterView } from 'vue-router'
 
+import ExampleThaiDatetimePicker from './components/ExampleThaiDatetimePicker.vue';
+
 const mobileMenuOpen = ref(false)
 </script>
 
 <template>
-  <div class="w-full bg-emerald-600 border-t-2 border-emerald-500">
-    <div class="container max-w-7xl mx-auto px-4 py-1 flex justify-between items-center">
-      <span class="text-xs text-emerald-950 truncate">ตึกสำนักงานปลัดกระทรวงสาธารณสุข อาคาร 6 ชั้น 3
-        ซอยติวานนท์ ถนนติวานนท์
-        ตำบลตลาดขวัญ อำเภอเมือง จังหวัดนนทบุรี 11000
-      </span>
-      <a href="#"
-        class=" min-w-max text-xs text-emerald-950 hover:text-black pl-4 lg:px-4 rounded block transition-colors"><i
-          class="fi fi-rr-sign-in-alt mr-2 align-middle"></i>สำหรับเจ้าหน้าที่</a>
-    </div>
-  </div>
   <div class="sticky top-0 bg-white/80 backdrop-blur-md z-50">
     <div class="container max-w-7xl mx-auto px-4 py-2">
       <div class="flex flex-col lg:flex-row justify-between items-center">
         <div class="w-full lg:w-fit flex justify-between gap-x-4">
           <router-view to="/">
             <div class="flex justify-center items-center select-none">
-              <img src="/src/assets/vue.svg" alt="Logo" class="h-12 mr-3 logo-animation" draggable="false">
+              <img src="/src/assets/logo_MOPH@0.25x.png" alt="Logo" class="h-12 mr-3 logo-animation" draggable="false">
               <div class="min-w-fit text-emerald-800 font-bold flex flex-col-reverse"
                 alt="กองกฎหมาย สำนักงานปลัดกระทรวงสาธารณสุข">
                 <h1 alt="Legal Affairs Divisions">กองกฎหมาย</h1>
@@ -66,13 +57,23 @@ const mobileMenuOpen = ref(false)
     </div>
   </div>
 
-  <main class="container mx-auto">
+  <main class="container mx-auto flex flex-col">
     <h1 class="text-6xl text-emerald-500">Hello world</h1>
 
-    <div class="card">
-      <h2 class="text-emerald-500">Card</h2>
-    </div>
+    <example-thai-datetime-picker />
   </main>
 
   <router-view />
+
+  <footer class="w-full bg-emerald-600 border-t-2 border-emerald-500">
+    <div class="container mx-auto px-4 py-1 flex justify-between items-center">
+      <span class="text-xs text-emerald-950 truncate">ตึกสำนักงานปลัดกระทรวงสาธารณสุข อาคาร 6 ชั้น 3
+        ซอยติวานนท์ ถนนติวานนท์
+        ตำบลตลาดขวัญ อำเภอเมือง จังหวัดนนทบุรี 11000
+      </span>
+      <a href="#"
+        class=" min-w-max text-xs text-emerald-950 hover:text-black pl-4 lg:px-4 rounded block transition-colors"><i
+          class="fi fi-rr-sign-in-alt mr-2 align-middle"></i>สำหรับเจ้าหน้าที่</a>
+    </div>
+  </footer>
 </template>
