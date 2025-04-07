@@ -4,6 +4,8 @@ import { format, addMonths, addYears, setHours, setMinutes, startOfDay, isSameDa
 import { th } from 'date-fns/locale';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue';
 
+import CustomSelect from './CustomSelect.vue';
+
 type DatePickerMode = 'date' | 'datetime' | 'time';
 type DateRangeMode = 'single' | 'range';
 type YearType = 'buddhist' | 'christian';
@@ -164,7 +166,6 @@ function getFirstDayOfMonth(year: number, month: number) {
 
 // Calendar data
 const calendarWeeks = computed(() => {
-  // ... (calendar generation logic remains the same) ...
   const year = currentMonth.value.getFullYear();
   const month = currentMonth.value.getMonth();
   const daysInMonth = getDaysInMonth(year, month);
@@ -223,7 +224,6 @@ const thaiMonths = computed(() => {
 });
 
 const years = computed(() => {
-  // ... (year generation remains the same) ...
   const currentYear = currentMonth.value.getFullYear();
   const startYear = currentYear - 12;
   const endYear = currentYear + 12;
@@ -240,10 +240,19 @@ const years = computed(() => {
 });
 
 const weekdays = computed(() => {
-  // ... (weekday generation remains the same) ...
-  const days = props.firstDayOfWeek === 1
-    ? ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.']
-    : ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
+  const th_days = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
+  const en_days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  let days: string[];
+
+  days = [...(props.yearType === 'buddhist' ? th_days : en_days)]; // Clone the array to avoid modifying the original
+  // check if first day of the week is set to Monday (1=Monday, 0=Sunday)
+  // if true then move the first day to the end (move Sunday to the end)
+  if (props.firstDayOfWeek === 1) {
+    const firstDay = days.shift() as string; // Remove the first element and store it
+    days.push(firstDay); // Add the removed element to the end
+  }
+
   return days;
 });
 
@@ -251,24 +260,27 @@ const weekdays = computed(() => {
 function formatDate(date: Date | null): string {
   if (!date) return '';
 
+  const isThai = props.yearType === 'buddhist';
+  const localeOptions = isThai ? { locale: th } : {};
   const yearOffset = props.yearType === 'buddhist' ? 543 : 0;
   const adjustedDate = new Date(date); // Clone to avoid mutating original
 
   if (props.mode === 'date') {
-    return format(adjustedDate, 'd MMMM ', { locale: th }) + (adjustedDate.getFullYear() + yearOffset);
+    return format(adjustedDate, 'd MMMM ', localeOptions) + (adjustedDate.getFullYear() + yearOffset);
   } else if (props.mode === 'datetime') {
-    return format(adjustedDate, 'd MMMM ', { locale: th }) + (adjustedDate.getFullYear() + yearOffset) +
-      format(adjustedDate, ' HH:mm น.', { locale: th }); // Add space before time
+    return format(adjustedDate, 'd MMMM ', localeOptions) + (adjustedDate.getFullYear() + yearOffset) +
+      String(isThai ? ' เวลา ' : '') + format(adjustedDate, ' HH:mm', localeOptions) + (isThai ? ' น.' : ''); // Add space before time
   } else { // time mode
     // For time mode only, we might not have a date part if modelValue starts null
     const baseDate = date ? adjustedDate : setMinutes(setHours(new Date(), (date as Date)?.getHours() ?? 0), (date as Date)?.getMinutes() ?? 0);
-    return format(baseDate, 'HH:mm น.', { locale: th });
+    return String(isThai ? 'เวลา ' : '') + format(baseDate, 'HH:mm', localeOptions) + String(isThai ? ' น.' : '');
   }
 }
 
 function formatMonthYear(): string {
+  const localeOptions = props.yearType === 'buddhist' ? { locale: th } : {};
   const year = currentMonth.value.getFullYear() + (props.yearType === 'buddhist' ? 543 : 0);
-  return format(currentMonth.value, 'MMMM ', { locale: th }) + year;
+  return format(currentMonth.value, 'MMMM ', localeOptions) + year;
 }
 
 // State helpers
@@ -539,8 +551,8 @@ function cancelSelection() {
 }
 
 // Generate hours and minutes for time selection
-const hours = Array.from({ length: 24 }, (_, i) => i);
-const minutes = Array.from({ length: 60 }, (_, i) => i);
+const hoursOptions = Array.from({ length: 24 }, (_, i) => ({ value: i, label: String(i).padStart(2, '0') }));
+const minutesOptions = Array.from({ length: 60 }, (_, i) => ({ value: i, label: String(i).padStart(2, '0') }));
 
 // **NEW:** Computed property to control visibility of the "Confirm" button in the CALENDAR footer
 const showCalendarConfirmButton = computed(() => {
@@ -636,16 +648,16 @@ const showCalendarSetTimeButton = computed(() => {
 
         <div class="flex justify-between items-center pt-3 border-t border-gray-200 mt-2">
           <button @click="cancelSelection" class="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-md">
-            ยกเลิก
+            {{ props.yearType === 'buddhist' ? 'ยกเลิก' : 'Cancel' }}
           </button>
           <div class="space-x-2">
             <button v-if="showCalendarSetTimeButton" @click.stop="currentView = 'time'"
               class="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 rounded-md">
-              ตั้งเวลา
+              {{ props.yearType === 'buddhist' ? 'ตั้งเวลา' : 'Set Time' }}
             </button>
             <button v-if="showCalendarConfirmButton" @click="confirmSelectionFromCalendar"
               class="px-3 py-1.5 text-sm bg-emerald-500 text-white font-medium hover:bg-emerald-600 rounded-md">
-              ตกลง
+              {{ props.yearType === 'buddhist' ? 'ตกลง' : 'Confirm' }}
             </button>
           </div>
         </div>
@@ -725,9 +737,10 @@ const showCalendarSetTimeButton = computed(() => {
         </div>
       </div>
 
+      <!-- Time view -->
       <div v-else-if="currentView === 'time'" class="space-y-4">
         <div class="text-center font-semibold text-gray-700">
-          ตั้งเวลา
+          {{ props.yearType === 'buddhist' ? 'เลือกเวลา' : 'Select Time' }}
           <div v-if="rangeMode === 'single' && selectedDate && mode === 'datetime'"
             class="text-xs font-normal text-gray-500 mt-1">
             {{ formatDate(selectedDate)?.split(' ')[0] }} {{ formatDate(selectedDate)?.split(' ')[1] }} {{
@@ -743,24 +756,18 @@ const showCalendarSetTimeButton = computed(() => {
 
         <div class="flex items-center justify-center space-x-3">
           <div class="flex flex-col items-center">
-            <label for="select-hours" class="text-xs text-gray-500 mb-1">ชั่วโมง</label>
-            <select id="select-hours" v-model.number="selectedHours"
-              class="w-16 p-2 border border-gray-300 rounded text-center appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-              <option v-for="hourValue in hours" :key="`hr-${hourValue}`" :value="hourValue">
-                {{ hourValue.toString().padStart(2, '0') }}
-              </option>
-            </select>
+            <label for="select-hours" class="text-xs text-gray-500 mb-1">{{ props.yearType === 'buddhist' ? 'ชั่วโมง' :
+              'Hour' }}</label>
+            <CustomSelect id="select-hours" v-model.number="selectedHours" :options="hoursOptions"
+              :placeholder="props.yearType === 'buddhist' ? 'ชั่วโมง' : 'Hour'" />
           </div>
 
           <span class="text-2xl font-light text-gray-400 pb-3">:</span>
           <div class="flex flex-col items-center">
-            <label for="select-minutes" class="text-xs text-gray-500 mb-1">นาที</label>
-            <select id="select-minutes" v-model.number="selectedMinutes"
-              class="w-16 p-2 border border-gray-300 rounded text-center appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-              <option v-for="minuteValue in minutes" :key="`min-${minuteValue}`" :value="minuteValue">
-                {{ minuteValue.toString().padStart(2, '0') }}
-              </option>
-            </select>
+            <label for="select-minutes" class="text-xs text-gray-500 mb-1">{{ props.yearType === 'buddhist' ? 'นาที' :
+              'Minute' }}</label>
+            <CustomSelect id="select-minutes" v-model.number="selectedMinutes" :options="minutesOptions"
+              :placeholder="props.yearType === 'buddhist' ? 'นาที' : 'Minute'" />
           </div>
         </div>
 
@@ -768,11 +775,11 @@ const showCalendarSetTimeButton = computed(() => {
           <button @click.stop="currentView = (mode === 'datetime' ? 'calendar' : 'time')" :disabled="mode === 'time'"
             class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
             :class="{ 'opacity-50 cursor-not-allowed': mode === 'time' }">
-            กลับ
+            {{ props.yearType === 'buddhist' ? 'กลับ' : 'Go back' }}
           </button>
           <button @click="confirmTime"
             class="px-3 py-1.5 text-sm bg-emerald-500 text-white font-medium hover:bg-emerald-600 rounded-md">
-            ตกลง
+            {{ props.yearType === 'buddhist' ? 'ตกลง' : 'Confirm' }}
           </button>
         </div>
       </div>
@@ -784,7 +791,7 @@ const showCalendarSetTimeButton = computed(() => {
 <style scoped>
 /* Add scrollbar styling for time selects if they overflow on small heights */
 select {
-  max-height: 150px;
+  max-height: 200px;
   overflow-y: auto;
 }
 
