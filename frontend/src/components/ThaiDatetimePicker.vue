@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
-import { format, addMonths, addYears, setHours, setMinutes } from 'date-fns';
+import { format, addMonths, addYears, setHours, setMinutes, startOfDay } from 'date-fns';
 import { th } from 'date-fns/locale';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue';
 
@@ -30,6 +30,29 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits(['update:modelValue', 'change']);
+
+const computedModelValue = computed({
+  get: () => props.modelValue,
+  set: (newValue) => {
+    if (props.rangeMode === 'range') {
+      if (!Array.isArray(newValue) || newValue.length !== 2) {
+        emit('update:modelValue', [null, null]);
+        emit('change', [null, null]);
+      } else {
+        emit('update:modelValue', newValue as [Date | null, Date | null]);
+        emit('change', newValue as [Date | null, Date | null]);
+      }
+    } else {
+      if (Array.isArray(newValue)) {
+        emit('update:modelValue', null);
+        emit('change', null);
+      } else {
+        emit('update:modelValue', newValue as Date | null);
+        emit('change', newValue as Date | null);
+      }
+    }
+  }
+});
 
 // UI state
 const isOpen = ref(false);
@@ -72,29 +95,58 @@ onBeforeUnmount(() => {
 watch(() => props.modelValue, initializeValues);
 
 function initializeValues() {
-  if (!props.modelValue) {
-    selectedDate.value = null;
-    selectedStartDate.value = null;
-    selectedEndDate.value = null;
-    return;
-  }
+  const value = props.modelValue;
 
   if (props.rangeMode === 'single') {
-    selectedDate.value = props.modelValue as Date;
+    const dateValue = value as Date | null;
+    selectedDate.value = dateValue ? new Date(dateValue) : null;
     if (selectedDate.value) {
-      currentMonth.value = new Date(selectedDate.value);
+      if (!isOpen.value || selectedDate.value.getMonth() !== currentMonth.value.getMonth() || selectedDate.value.getFullYear() !== currentMonth.value.getFullYear()) {
+        currentMonth.value = new Date(selectedDate.value);
+      }
       if (props.mode === 'datetime' || props.mode === 'time') {
         selectedHours.value = selectedDate.value.getHours();
         selectedMinutes.value = selectedDate.value.getMinutes();
+      } else {
+        selectedHours.value = 0;
+        selectedMinutes.value = 0;
       }
+    } else {
+      selectedHours.value = 0;
+      selectedMinutes.value = 0;
+      // Keep currentMonth as is if no value, or set to today if needed
+      // currentMonth.value = new Date(); // Only set if you always want to reset view
     }
-  } else {
-    const [start, end] = props.modelValue as [Date | null, Date | null];
-    selectedStartDate.value = start;
-    selectedEndDate.value = end;
+    selectedStartDate.value = null;
+    selectedEndDate.value = null;
+
+  } else { // rangeMode === 'range'
+    const rangeValue = value as [Date | null, Date | null] | null;
+    const start = rangeValue?.[0];
+    const end = rangeValue?.[1];
+
+    selectedStartDate.value = start ? new Date(start) : null;
+    selectedEndDate.value = end ? new Date(end) : null;
+
     if (selectedStartDate.value) {
-      currentMonth.value = new Date(selectedStartDate.value);
+      if (!isOpen.value || selectedStartDate.value.getMonth() !== currentMonth.value.getMonth() || selectedStartDate.value.getFullYear() !== currentMonth.value.getFullYear()) {
+        currentMonth.value = new Date(selectedStartDate.value);
+      }
+      if (props.mode === 'datetime') {
+        selectedHours.value = selectedStartDate.value.getHours();
+        selectedMinutes.value = selectedStartDate.value.getMinutes();
+      } else {
+        selectedHours.value = 0;
+        selectedMinutes.value = 0;
+      }
+
+    } else {
+      selectedHours.value = 0;
+      selectedMinutes.value = 0;
+      // Keep currentMonth as is if no value, or set to today if needed
+      // currentMonth.value = new Date(); // Only set if you always want to reset view
     }
+    selectedDate.value = null;
   }
 }
 
@@ -111,11 +163,9 @@ function getFirstDayOfMonth(year: number, month: number) {
 const calendarWeeks = computed(() => {
   const year = currentMonth.value.getFullYear();
   const month = currentMonth.value.getMonth();
-
   const daysInMonth = getDaysInMonth(year, month);
   let firstDay = getFirstDayOfMonth(year, month);
 
-  // Adjust for first day of week
   if (props.firstDayOfWeek === 1) {
     firstDay = firstDay === 0 ? 6 : firstDay - 1;
   }
@@ -123,53 +173,34 @@ const calendarWeeks = computed(() => {
   const prevMonthYear = month === 0 ? year - 1 : year;
   const prevMonth = month === 0 ? 11 : month - 1;
   const daysInPrevMonth = getDaysInMonth(prevMonthYear, prevMonth);
-
   const nextMonthYear = month === 11 ? year + 1 : year;
   const nextMonth = month === 11 ? 0 : month + 1;
-
   const days: { date: Date; isCurrentMonth: boolean; isToday: boolean; isDisabled: boolean }[] = [];
+  const today = startOfDay(new Date());
 
-  // Days from previous month
   for (let i = 0; i < firstDay; i++) {
     const day = daysInPrevMonth - firstDay + i + 1;
-    const date = new Date(prevMonthYear, prevMonth, day);
-    days.push({
-      date,
-      isCurrentMonth: false,
-      isToday: isToday(date),
-      isDisabled: isDateDisabled(date)
-    });
+    const date = startOfDay(new Date(prevMonthYear, prevMonth, day));
+    days.push({ date, isCurrentMonth: false, isToday: date.getTime() === today.getTime(), isDisabled: isDateDisabled(date) });
   }
 
-  // Days from current month
   for (let i = 1; i <= daysInMonth; i++) {
-    const date = new Date(year, month, i);
-    days.push({
-      date,
-      isCurrentMonth: true,
-      isToday: isToday(date),
-      isDisabled: isDateDisabled(date)
-    });
+    const date = startOfDay(new Date(year, month, i));
+    days.push({ date, isCurrentMonth: true, isToday: date.getTime() === today.getTime(), isDisabled: isDateDisabled(date) });
   }
 
-  // Days from next month
-  const remainingDays = 42 - days.length; // 6 rows of 7 days
+  const currentDaysCount = days.length;
+  const remainingDays = (currentDaysCount % 7 === 0) ? 0 : 7 - (currentDaysCount % 7);
+
   for (let i = 1; i <= remainingDays; i++) {
-    const date = new Date(nextMonthYear, nextMonth, i);
-    days.push({
-      date,
-      isCurrentMonth: false,
-      isToday: isToday(date),
-      isDisabled: isDateDisabled(date)
-    });
+    const date = startOfDay(new Date(nextMonthYear, nextMonth, i));
+    days.push({ date, isCurrentMonth: false, isToday: date.getTime() === today.getTime(), isDisabled: isDateDisabled(date) });
   }
 
-  // Group by weeks
   const weeks = [];
   for (let i = 0; i < days.length; i += 7) {
     weeks.push(days.slice(i, i + 7));
   }
-
   return weeks;
 });
 
@@ -188,8 +219,8 @@ const thaiMonths = computed(() => {
 
 const years = computed(() => {
   const currentYear = currentMonth.value.getFullYear();
-  const startYear = currentYear - 10;
-  const endYear = currentYear + 10;
+  const startYear = currentYear - 12;
+  const endYear = currentYear + 12;
   const yearsArray = [];
 
   for (let i = startYear; i <= endYear; i++) {
@@ -322,48 +353,76 @@ function handleClickOutside(event: MouseEvent) {
 }
 
 function toggleCalendar() {
-  if (props.disabled) return;
+  /* if (props.disabled) return;
 
   isOpen.value = !isOpen.value;
   if (isOpen.value) {
     currentView.value = props.mode === 'time' ? 'time' : 'calendar';
+  } */
+
+  if (props.disabled) return;
+  const shouldOpen = !isOpen.value;
+  isOpen.value = shouldOpen;
+
+  if (shouldOpen) {
+    initializeValues(); // Sync state when opening
+    currentView.value = props.mode === 'time' ? 'time' : 'calendar';
+    const initialDate = props.rangeMode === 'single'
+      ? selectedDate.value
+      : selectedStartDate.value;
+    if (initialDate && (props.mode === 'date' || props.mode === 'datetime')) {
+      currentMonth.value = new Date(initialDate.getFullYear(), initialDate.getMonth(), 1);
+    } else if (!initialDate) {
+      currentMonth.value = new Date(); // Default to current month if no value
+    }
   }
 }
 
 function selectDate(date: Date) {
-  if (props.rangeMode === 'single') {
-    selectedDate.value = new Date(date);
+  const selectedDay = startOfDay(new Date(date));
 
-    if (props.mode === 'datetime' || props.mode === 'time') {
-      selectedDate.value = setHours(selectedDate.value, selectedHours.value);
-      selectedDate.value = setMinutes(selectedDate.value, selectedMinutes.value);
-    }
+  if (props.rangeMode === 'single') {
+    const finalDate = setMinutes(setHours(selectedDay, selectedHours.value), selectedMinutes.value);
+    selectedDate.value = finalDate;
 
     if (props.mode === 'date') {
-      emit('update:modelValue', selectedDate.value);
-      emit('change', selectedDate.value);
+      computedModelValue.value = finalDate;
       isOpen.value = false;
     } else if (props.mode === 'datetime') {
       currentView.value = 'time';
+    } else { // time mode (shouldn't be reached from calendar view)
+      computedModelValue.value = finalDate;
+      isOpen.value = false;
     }
-  } else {
+  } else { // rangeMode === 'range'
     if (!selectedStartDate.value || (selectedStartDate.value && selectedEndDate.value)) {
-      selectedStartDate.value = new Date(date);
+      selectedStartDate.value = selectedDay;
       selectedEndDate.value = null;
+      hoveredDate.value = null;
+      // Do not close yet, wait for end date selection
     } else {
-      if (date < selectedStartDate.value) {
-        selectedEndDate.value = selectedStartDate.value;
-        selectedStartDate.value = new Date(date);
+      const startDate = selectedStartDate.value; // Keep reference
+      if (selectedDay < startDate) {
+        selectedEndDate.value = startDate;
+        selectedStartDate.value = selectedDay;
       } else {
-        selectedEndDate.value = new Date(date);
+        selectedEndDate.value = selectedDay;
       }
+      hoveredDate.value = null;
+
+      // Apply selected time to both start and end
+      const finalStartDate = setMinutes(setHours(selectedStartDate.value, selectedHours.value), selectedMinutes.value);
+      const finalEndDate = setMinutes(setHours(selectedEndDate.value, selectedHours.value), selectedMinutes.value); // Apply same time, or add separate time selection logic if needed
+
+      // Update internal state with time *before* deciding next step
+      selectedStartDate.value = finalStartDate;
+      selectedEndDate.value = finalEndDate;
 
       if (props.mode === 'date') {
-        emit('update:modelValue', [selectedStartDate.value, selectedEndDate.value]);
-        emit('change', [selectedStartDate.value, selectedEndDate.value]);
+        computedModelValue.value = [finalStartDate, finalEndDate];
         isOpen.value = false;
       } else if (props.mode === 'datetime') {
-        currentView.value = 'time';
+        currentView.value = 'time'; // Go to time view after selecting range
       }
     }
   }
@@ -380,20 +439,35 @@ function selectYear(year: number) {
 }
 
 function confirmTime() {
-  if (props.rangeMode === 'single' && selectedDate.value) {
-    selectedDate.value = setHours(selectedDate.value, selectedHours.value);
-    selectedDate.value = setMinutes(selectedDate.value, selectedMinutes.value);
-    emit('update:modelValue', selectedDate.value);
-    emit('change', selectedDate.value);
-  } else if (props.rangeMode === 'range' && selectedStartDate.value && selectedEndDate.value) {
-    selectedStartDate.value = setHours(selectedStartDate.value, selectedHours.value);
-    selectedStartDate.value = setMinutes(selectedStartDate.value, selectedMinutes.value);
-    selectedEndDate.value = setHours(selectedEndDate.value, selectedHours.value);
-    selectedEndDate.value = setMinutes(selectedEndDate.value, selectedMinutes.value);
-    emit('update:modelValue', [selectedStartDate.value, selectedEndDate.value]);
-    emit('change', [selectedStartDate.value, selectedEndDate.value]);
-  }
+  if (props.rangeMode === 'single') {
+    let baseDate = selectedDate.value;
+    // If only time mode, or date wasn't selected yet, use today as base
+    if (!baseDate && (props.mode === 'time' || props.mode === 'datetime')) {
+      baseDate = startOfDay(new Date()); // Use start of today
+    } else if (!baseDate) {
+      // Should not happen if flow is correct, but handle defensively
+      console.warn("Confirming time without a selected date.");
+      isOpen.value = false; // Close as we can't proceed
+      return;
+    }
 
+    const finalDate = setMinutes(setHours(baseDate, selectedHours.value), selectedMinutes.value);
+    selectedDate.value = finalDate; // Update internal state too
+    computedModelValue.value = finalDate;
+
+  } else { // rangeMode === 'range'
+    if (selectedStartDate.value && selectedEndDate.value) {
+      const finalStartDate = setMinutes(setHours(selectedStartDate.value, selectedHours.value), selectedMinutes.value);
+      const finalEndDate = setMinutes(setHours(selectedEndDate.value, selectedHours.value), selectedMinutes.value); // Apply same time to both
+      selectedStartDate.value = finalStartDate; // Update internal state
+      selectedEndDate.value = finalEndDate;     // Update internal state
+      computedModelValue.value = [finalStartDate, finalEndDate];
+    } else {
+      // Handle case where range is not fully selected? Maybe just close or show warning.
+      console.warn("Confirming time without a complete date range.");
+      // Optionally reset or initialize: initializeFromModelValue();
+    }
+  }
   isOpen.value = false;
 }
 
@@ -405,7 +479,7 @@ function changeYear(delta: number) {
   currentMonth.value = addYears(currentMonth.value, delta);
 }
 
-function handleDateHover(date: Date) {
+function handleDateHover(date: Date | null) {
   hoveredDate.value = date;
 }
 
@@ -456,7 +530,8 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <button @click="showMonthView" class="font-medium text-gray-700 text-sm px-2 py-1 hover:bg-gray-100 rounded">
+          <button @click.stop="showMonthView"
+            class="font-medium text-gray-700 text-sm px-2 py-1 hover:bg-gray-100 rounded">
             {{ formatMonthYear() }}
           </button>
           <button @click="changeMonth(1)" class="p-1 hover:bg-gray-100 rounded-full">
@@ -476,10 +551,26 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
         <!-- Days -->
         <div class="grid">
-          <div v-for="(week, weekIndex) in calendarWeeks" :key="weekIndex" class="grid grid-cols-7 gap-1">
-            <div v-for="(day, dayIndex) in week" :key="`${weekIndex}-${dayIndex}`"
+          <div v-for="(week, weekIndex) in calendarWeeks" :key="weekIndex" class="grid grid-cols-7">
+            <div v-if="mode === 'datetime'" v-for="(day, dayIndex) in week" :key="`${weekIndex}-${dayIndex}-datetime`"
+              @click.stop="!day.isDisabled && selectDate(day.date)" @mouseenter="handleDateHover(day.date)"
+              @mouseleave="handleDateHover(null)"
+              class="hover:bg-emerald-500 hover:text-white p-1 text-center text-sm rounded-md cursor-pointer transition-colors duration-200"
+              :class="{
+                'text-gray-400': !day.isCurrentMonth,
+                'font-medium': day.isCurrentMonth,
+                'bg-emerald-500 text-white': isDateSelected(day.date) || isRangeStart(day.date) || isRangeEnd(day.date),
+                'bg-emerald-100': isDateInRange(day.date) && !isRangeStart(day.date) && !isRangeEnd(day.date),
+                'ring-2 ring-emerald-300': day.isToday && !isDateSelected(day.date),
+                'opacity-40 cursor-not-allowed': day.isDisabled
+              }">
+              {{ day.date.getDate() }}
+            </div>
+            <div v-else v-for="(day, dayIndex) in week" :key="`${weekIndex}-${dayIndex}`"
               @click="!day.isDisabled && selectDate(day.date)" @mouseenter="handleDateHover(day.date)"
-              class="p-1 text-center text-sm rounded-md cursor-pointer transition-colors duration-200" :class="{
+              @mouseleave="handleDateHover(null)"
+              class="hover:bg-emerald-500 hover:text-white p-1 text-center text-sm rounded-md cursor-pointer transition-colors duration-200"
+              :class="{
                 'text-gray-400': !day.isCurrentMonth,
                 'font-medium': day.isCurrentMonth,
                 'bg-emerald-500 text-white': isDateSelected(day.date) || isRangeStart(day.date) || isRangeEnd(day.date),
@@ -498,7 +589,7 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
             ยกเลิก
           </button>
           <div class="space-x-2">
-            <button v-if="mode === 'datetime'" @click="currentView = 'time'"
+            <button v-if="mode === 'datetime'" @click.stop="currentView = 'time'"
               class="px-3 py-1 text-sm bg-blue-100 text-blue-600 hover:bg-blue-200 rounded">
               ตั้งเวลา
             </button>
@@ -513,16 +604,16 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
       <!-- Month selection view -->
       <div v-else-if="currentView === 'month'" class="space-y-3">
         <div class="flex justify-between items-center mb-2">
-          <button @click="changeYear(-1)" class="p-1 hover:bg-gray-100 rounded-full">
+          <button @click.stop="changeYear(-1)" class="p-1 hover:bg-gray-100 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <button @click="showYearView" class="font-medium text-gray-700 px-2 py-1 hover:bg-gray-100 rounded">
+          <button @click.stop="showYearView" class="font-medium text-gray-700 px-2 py-1 hover:bg-gray-100 rounded">
             {{ currentMonth.getFullYear() + (yearType === 'buddhist' ? 543 : 0) }}
           </button>
-          <button @click="changeYear(1)" class="p-1 hover:bg-gray-100 rounded-full">
+          <button @click.stop="changeYear(1)" class="p-1 hover:bg-gray-100 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -531,7 +622,7 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
         </div>
 
         <div class="grid grid-cols-3 gap-2">
-          <button v-for="month in thaiMonths" :key="month.value" @click="selectMonth(month.value)"
+          <button v-for="month in thaiMonths" :key="month.value" @click.stop="selectMonth(month.value)"
             class="p-2 text-sm rounded hover:bg-blue-100 text-center" :class="{
               'bg-blue-500 text-white': month.value === currentMonth.getMonth()
             }">
@@ -543,7 +634,7 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
       <!-- Year selection view -->
       <div v-else-if="currentView === 'year'" class="space-y-3">
         <div class="flex justify-between items-center mb-2">
-          <button @click="changeYear(-10)" class="p-1 hover:bg-gray-100 rounded-full">
+          <button @click.stop="changeYear(-12)" class="p-1 hover:bg-gray-100 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -553,7 +644,7 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
             {{ yearType === 'buddhist' ? years[0].buddhist : years[0].christian }} -
             {{ yearType === 'buddhist' ? years[years.length - 1].buddhist : years[years.length - 1].christian }}
           </span>
-          <button @click="changeYear(10)" class="p-1 hover:bg-gray-100 rounded-full">
+          <button @click.stop="changeYear(12)" class="p-1 hover:bg-gray-100 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -563,7 +654,7 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
         <div class="grid grid-cols-3 gap-2">
           <button v-for="year in years" :key="yearType === 'buddhist' ? year.buddhist : year.christian"
-            @click="selectYear(year.christian)" class="p-2 text-sm rounded hover:bg-blue-100 text-center" :class="{
+            @click.stop="selectYear(year.christian)" class="p-2 text-sm rounded hover:bg-blue-100 text-center" :class="{
               'bg-blue-500 text-white': year.christian === currentMonth.getFullYear()
             }">
             {{ yearType === 'buddhist' ? year.buddhist : year.christian }}
@@ -580,9 +671,9 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
         <div class="flex items-center justify-center space-x-2">
           <div class="flex flex-col items-center">
             <span class="text-xs text-gray-500 mb-1">ชั่วโมง</span>
-            <select v-model="selectedHours" class="p-2 border border-gray-300 rounded text-center">
-              <option v-for="hour in hours" :key="hour" :value="hour">
-                {{ hour.toString().padStart(2, '0') }}
+            <select v-model.number="selectedHours" class="p-2 border border-gray-300 rounded text-center">
+              <option v-for="hourValue in hours" :key="hourValue" :value="hourValue">
+                {{ hourValue.toString().padStart(2, '0') }}
               </option>
             </select>
           </div>
@@ -591,9 +682,9 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
           <div class="flex flex-col items-center">
             <span class="text-xs text-gray-500 mb-1">นาที</span>
-            <select v-model="selectedMinutes" class="p-2 border border-gray-300 rounded text-center">
-              <option v-for="minute in minutes" :key="minute" :value="minute">
-                {{ minute.toString().padStart(2, '0') }}
+            <select v-model.number="selectedMinutes" class="p-2 border border-gray-300 rounded text-center">
+              <option v-for="minuteValue in minutes" :key="minuteValue" :value="minuteValue">
+                {{ minuteValue.toString().padStart(2, '0') }}
               </option>
             </select>
           </div>
@@ -601,7 +692,8 @@ const minutes = Array.from({ length: 60 }, (_, i) => i);
 
         <!-- Footer -->
         <div class="flex justify-between pt-3 border-t border-gray-200">
-          <button @click="currentView = 'calendar'" class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded">
+          <button @click.stop="currentView = 'calendar'"
+            class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded">
             กลับ
           </button>
           <button @click="confirmTime" class="px-3 py-1 text-sm bg-blue-500 text-white hover:bg-blue-600 rounded">
