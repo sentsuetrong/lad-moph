@@ -581,7 +581,7 @@ const showCalendarSetTimeButton = computed(() => {
   <div class="relative w-full">
     <div ref="inputRef" @click="toggleCalendar"
       class="border border-gray-300 rounded-md p-2 flex items-center justify-between cursor-pointer w-full min-h-[40px]"
-      :class="{ 'bg-gray-100 opacity-60 cursor-not-allowed': disabled, 'ring-2 ring-blue-500': isOpen }">
+      :class="{ 'bg-gray-100 opacity-60 cursor-not-allowed': disabled, 'ring-2 ring-emerald-500': isOpen }">
       <div v-if="displayValue" class="text-sm flex-1 mr-1">{{ displayValue }}</div>
       <div v-else class="text-gray-400 text-sm flex-1 mr-1">{{ placeholder }}</div>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 flex-shrink-0" fill="none"
@@ -594,6 +594,7 @@ const showCalendarSetTimeButton = computed(() => {
     <div v-if="isOpen" ref="dropdownRef" :style="floatingStyles"
       class="bg-white border border-gray-200 rounded-md shadow-lg p-3 z-50 w-72 sm:w-80 md:w-96 transition-opacity duration-200">
       <div v-if="currentView === 'calendar'" class="space-y-3">
+        <!-- Header -->
         <div class="flex justify-between items-center mb-2">
           <button @click="changeMonth(-1)" aria-label="Previous month" class="p-1.5 hover:bg-gray-100 rounded-full">
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -613,12 +614,14 @@ const showCalendarSetTimeButton = computed(() => {
           </button>
         </div>
 
+        <!-- Days of the week -->
         <div class="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 font-medium">
           <div v-for="(day, index) in weekdays" :key="index" class="p-1">
             {{ day }}
           </div>
         </div>
 
+        <!-- Days view -->
         <div class="grid">
           <div v-for="(week, weekIndex) in calendarWeeks" :key="`week-${weekIndex}`" class="grid grid-cols-7">
             <div v-for="(day, _) in week" :key="day.date.toISOString().substring(0, 10)"
@@ -645,24 +648,26 @@ const showCalendarSetTimeButton = computed(() => {
           </div>
         </div>
 
-
+        <!-- Footer -->
         <div class="flex justify-between items-center pt-3 border-t border-gray-200 mt-2">
-          <button @click="cancelSelection" class="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-md">
+          <button @click="cancelSelection"
+            class="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-md cursor-pointer">
             {{ props.yearType === 'buddhist' ? 'ยกเลิก' : 'Cancel' }}
           </button>
           <div class="space-x-2">
             <button v-if="showCalendarSetTimeButton" @click.stop="currentView = 'time'"
-              class="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 rounded-md">
+              class="px-3 py-1.5 text-sm bg-emerald-100 text-emerald-700 font-medium hover:bg-emerald-200 rounded-md cursor-pointer">
               {{ props.yearType === 'buddhist' ? 'ตั้งเวลา' : 'Set Time' }}
             </button>
             <button v-if="showCalendarConfirmButton" @click="confirmSelectionFromCalendar"
-              class="px-3 py-1.5 text-sm bg-emerald-500 text-white font-medium hover:bg-emerald-600 rounded-md">
+              class="px-3 py-1.5 text-sm bg-emerald-500 text-white font-medium hover:bg-emerald-600 rounded-md cursor-pointer">
               {{ props.yearType === 'buddhist' ? 'ตกลง' : 'Confirm' }}
             </button>
           </div>
         </div>
       </div>
 
+      <!-- Month view -->
       <div v-else-if="currentView === 'month'" class="space-y-3">
         <div class="flex justify-between items-center mb-2">
           <button @click.stop="changeYear(-1)" aria-label="Previous year" class="p-1.5 hover:bg-gray-100 rounded-full">
@@ -699,6 +704,7 @@ const showCalendarSetTimeButton = computed(() => {
         </div>
       </div>
 
+      <!-- Year view -->
       <div v-else-if="currentView === 'year'" class="space-y-3">
         <div class="flex justify-between items-center mb-2">
           <button @click.stop="changeYear(-1)" aria-label="Previous year range"
@@ -783,7 +789,6 @@ const showCalendarSetTimeButton = computed(() => {
           </button>
         </div>
       </div>
-
     </div>
   </div>
 </template>

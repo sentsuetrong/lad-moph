@@ -223,8 +223,8 @@ watch(searchQuery, () => {
 <template>
   <div class="relative w-full">
     <div ref="inputRef"
-      class="border border-gray-300 rounded-md p-2 flex items-center justify-between cursor-pointer w-full min-h-[40px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-      :class="{ 'ring-2 ring-blue-500 border-blue-500': isOpen }" @click.stop="isOpen = !isOpen"
+      class="border border-gray-300 rounded-md p-2 flex items-center justify-between cursor-pointer w-full min-h-[40px] focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      :class="{ 'ring-2 ring-emerald-500 border-emerald-500': isOpen }" @click.stop="isOpen = !isOpen"
       @keydown="handleKeyDown" tabindex="0">
       <div v-if="selectedOption" class="text-sm flex-1 mr-1 truncate"> {{ selectedOption.label }}
       </div>
@@ -241,7 +241,7 @@ watch(searchQuery, () => {
     <div v-if="isOpen" ref="dropdownRef" :style="floatingStyles"
       class="bg-white border border-gray-200 rounded-md shadow-lg z-50 w-full mt-1 transition-opacity duration-200">
       <div class="p-2"> <input v-model="searchQuery" type="text"
-          class="w-full text-sm border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full text-sm border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
           :placeholder="props.placeholder" @keydown="handleSearchKeyDown" ref="searchInputRef" />
       </div>
       <ul ref="listRef" class="max-h-40 overflow-y-auto p-1">
