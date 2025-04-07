@@ -81,7 +81,7 @@ const minutesOptions = Array.from({ length: 60 }, (_, i) => ({ value: i, label: 
       <!-- ตัวอย่างที่ 5: เลือกช่วงวันที่ -->
       <div class="p-4 border rounded-lg">
         <h2 class="text-lg font-semibold mb-2">เลือกช่วงวันที่</h2>
-        <ThaiDatetimePicker v-model="dateRange" rangeMode="range" placeholder="เลือกช่วงวันที่" />
+        <ThaiDatetimePicker v-model="dateRange" rangeMode="range" mode="date" placeholder="เลือกช่วงวันที่" />
         <div class="mt-2 text-sm text-gray-600">
           ค่าเริ่มต้น: {{ dateRange[0] ? dateRange[0].toLocaleDateString('th-TH') : 'ยังไม่ได้เลือก' }}<br>
           ค่าสิ้นสุด: {{ dateRange[1] ? dateRange[1].toLocaleDateString('th-TH') : 'ยังไม่ได้เลือก' }}

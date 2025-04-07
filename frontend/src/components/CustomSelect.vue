@@ -239,12 +239,13 @@ watch(searchQuery, () => {
     </div>
 
     <div v-if="isOpen" ref="dropdownRef" :style="floatingStyles"
-      class="bg-white border border-gray-200 rounded-md shadow-lg z-50 w-full mt-1 transition-opacity duration-200">
-      <div class="p-2"> <input v-model="searchQuery" type="text"
+      class="w-full bg-white border border-gray-200 rounded-md shadow-lg z-50 mt-1 transition-opacity duration-200">
+      <div class="p-2">
+        <input v-model="searchQuery" type="text"
           class="w-full text-sm border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
           :placeholder="props.placeholder" @keydown="handleSearchKeyDown" ref="searchInputRef" />
       </div>
-      <ul ref="listRef" class="max-h-40 overflow-y-auto p-1">
+      <ul ref="listRef" class="max-h-48 overflow-x-hidden overflow-y-auto p-1">
         <li v-for="(option, index) in filteredOptions" :key="option.value"
           class="text-sm p-2 rounded cursor-pointer hover:bg-gray-100" :class="{
             'bg-emerald-100 text-emerald-800': selectedOption?.value === option.value && highlightedIndex !== index, // Style for selected but not highlighted

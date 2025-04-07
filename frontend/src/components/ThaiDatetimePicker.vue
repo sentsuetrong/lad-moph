@@ -584,11 +584,8 @@ const showCalendarSetTimeButton = computed(() => {
       :class="{ 'bg-gray-100 opacity-60 cursor-not-allowed': disabled, 'ring-2 ring-emerald-500': isOpen }">
       <div v-if="displayValue" class="text-sm flex-1 mr-1">{{ displayValue }}</div>
       <div v-else class="text-gray-400 text-sm flex-1 mr-1">{{ placeholder }}</div>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 flex-shrink-0" fill="none"
-        viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
+      <i class="fi"
+        :class="{ 'fi-rr-calendar-day': mode === 'date', 'fi-rr-calendar-clock': mode === 'datetime', 'fi-rr-time-watch-calendar': mode === 'time' }" />
     </div>
 
     <div v-if="isOpen" ref="dropdownRef" :style="floatingStyles"
@@ -596,17 +593,19 @@ const showCalendarSetTimeButton = computed(() => {
       <div v-if="currentView === 'calendar'" class="space-y-3">
         <!-- Header -->
         <div class="flex justify-between items-center mb-2">
-          <button @click="changeMonth(-1)" aria-label="Previous month" class="p-1.5 hover:bg-gray-100 rounded-full">
+          <button @click="changeMonth(-1)" aria-label="Previous month"
+            class="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer">
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <button @click.stop="showMonthView"
-            class="font-semibold text-gray-700 text-sm px-2 py-1 hover:bg-gray-100 rounded">
+            class="font-semibold text-gray-700 text-sm px-2 py-1 hover:bg-gray-100 rounded cursor-pointer">
             {{ formatMonthYear() }}
           </button>
-          <button @click="changeMonth(1)" aria-label="Next month" class="p-1.5 hover:bg-gray-100 rounded-full">
+          <button @click="changeMonth(1)" aria-label="Next month"
+            class="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer">
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -657,7 +656,7 @@ const showCalendarSetTimeButton = computed(() => {
           <div class="space-x-2">
             <button v-if="showCalendarSetTimeButton" @click.stop="currentView = 'time'"
               class="px-3 py-1.5 text-sm bg-emerald-100 text-emerald-700 font-medium hover:bg-emerald-200 rounded-md cursor-pointer">
-              {{ props.yearType === 'buddhist' ? 'ตั้งเวลา' : 'Set Time' }}
+              {{ props.yearType === 'buddhist' ? 'ตั้งเวลา' : 'Set time' }}
             </button>
             <button v-if="showCalendarConfirmButton" @click="confirmSelectionFromCalendar"
               class="px-3 py-1.5 text-sm bg-emerald-500 text-white font-medium hover:bg-emerald-600 rounded-md cursor-pointer">
@@ -670,16 +669,19 @@ const showCalendarSetTimeButton = computed(() => {
       <!-- Month view -->
       <div v-else-if="currentView === 'month'" class="space-y-3">
         <div class="flex justify-between items-center mb-2">
-          <button @click.stop="changeYear(-1)" aria-label="Previous year" class="p-1.5 hover:bg-gray-100 rounded-full">
+          <button @click.stop="changeYear(-1)" aria-label="Previous year"
+            class="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer">
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <button @click.stop="showYearView" class="font-semibold text-gray-700 px-2 py-1 hover:bg-gray-100 rounded">
+          <button @click.stop="showYearView"
+            class="font-semibold text-gray-700 px-2 py-1 hover:bg-gray-100 rounded cursor-pointer">
             {{ currentMonth.getFullYear() + (yearType === 'buddhist' ? 543 : 0) }}
           </button>
-          <button @click.stop="changeYear(1)" aria-label="Next year" class="p-1.5 hover:bg-gray-100 rounded-full">
+          <button @click.stop="changeYear(1)" aria-label="Next year"
+            class="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer">
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -689,8 +691,9 @@ const showCalendarSetTimeButton = computed(() => {
 
         <div class="grid grid-cols-3 gap-2">
           <button v-for="month in thaiMonths" :key="month.value" @click.stop="selectMonth(month.value)"
-            class="p-2 text-sm rounded hover:bg-blue-100 text-center transition-colors duration-150" :class="{
-              'bg-blue-500 text-white hover:bg-blue-600': month.value === currentMonth.getMonth(),
+            class="p-2 text-sm rounded hover:bg-emerald-100 text-center transition-colors duration-150 cursor-pointer"
+            :class="{
+              'bg-emerald-500 text-white hover:bg-emerald-600': month.value === currentMonth.getMonth(),
               'bg-white text-gray-700': month.value !== currentMonth.getMonth()
             }">
             {{ yearType === 'buddhist' ? month.thaiName : month.englishName }}
@@ -698,7 +701,7 @@ const showCalendarSetTimeButton = computed(() => {
         </div>
         <div class="flex justify-end pt-3 border-t border-gray-200 mt-2">
           <button @click.stop="currentView = 'calendar'"
-            class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md">
+            class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer">
             กลับ
           </button>
         </div>
@@ -708,17 +711,18 @@ const showCalendarSetTimeButton = computed(() => {
       <div v-else-if="currentView === 'year'" class="space-y-3">
         <div class="flex justify-between items-center mb-2">
           <button @click.stop="changeYear(-1)" aria-label="Previous year range"
-            class="p-1.5 hover:bg-gray-100 rounded-full">
+            class="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer">
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
             </svg>
           </button>
-          <span class="font-semibold text-gray-700 text-sm">
+          <span class="font-semibold text-gray-700 text-sm cursor-default">
             {{ yearType === 'buddhist' ? years[0].buddhist : years[0].christian }} -
             {{ yearType === 'buddhist' ? years[years.length - 1].buddhist : years[years.length - 1].christian }}
           </span>
-          <button @click.stop="changeYear(1)" aria-label="Next year range" class="p-1.5 hover:bg-gray-100 rounded-full">
+          <button @click.stop="changeYear(1)" aria-label="Next year range"
+            class="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer">
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
@@ -728,8 +732,9 @@ const showCalendarSetTimeButton = computed(() => {
 
         <div class="grid grid-cols-4 gap-2"> <button v-for="year in years"
             :key="yearType === 'buddhist' ? year.buddhist : year.christian" @click.stop="selectYear(year.christian)"
-            class="p-2 text-sm rounded hover:bg-blue-100 text-center transition-colors duration-150" :class="{
-              'bg-blue-500 text-white hover:bg-blue-600': year.christian === currentMonth.getFullYear(),
+            class="p-2 text-sm rounded hover:bg-emerald-100 text-center transition-colors duration-150 cursor-pointer"
+            :class="{
+              'bg-emerald-500 text-white hover:bg-emerald-600': year.christian === currentMonth.getFullYear(),
               'bg-white text-gray-700': year.christian !== currentMonth.getFullYear()
             }">
             {{ yearType === 'buddhist' ? year.buddhist : year.christian }}
@@ -737,7 +742,7 @@ const showCalendarSetTimeButton = computed(() => {
         </div>
         <div class="flex justify-end pt-3 border-t border-gray-200 mt-2">
           <button @click.stop="currentView = 'month'"
-            class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md">
+            class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer">
             กลับ
           </button>
         </div>
@@ -780,11 +785,11 @@ const showCalendarSetTimeButton = computed(() => {
         <div class="flex justify-between items-center pt-3 border-t border-gray-200 mt-2">
           <button @click.stop="currentView = (mode === 'datetime' ? 'calendar' : 'time')" :disabled="mode === 'time'"
             class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
-            :class="{ 'opacity-50 cursor-not-allowed': mode === 'time' }">
+            :class="{ 'opacity-50 cursor-not-allowed': mode === 'time', 'cursor-pointer': mode !== 'time' }">
             {{ props.yearType === 'buddhist' ? 'กลับ' : 'Go back' }}
           </button>
           <button @click="confirmTime"
-            class="px-3 py-1.5 text-sm bg-emerald-500 text-white font-medium hover:bg-emerald-600 rounded-md">
+            class="px-3 py-1.5 text-sm bg-emerald-500 text-white font-medium hover:bg-emerald-600 rounded-md cursor-pointer">
             {{ props.yearType === 'buddhist' ? 'ตกลง' : 'Confirm' }}
           </button>
         </div>
