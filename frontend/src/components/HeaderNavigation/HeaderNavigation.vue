@@ -121,18 +121,21 @@ function closeAllDesktopDropdowns(): void {
 function handleDesktopLinkClick(item: NavigationItemType): void {
   closeAllDesktopDropdowns();
   // Vue Router จะจัดการ navigation
+  if (item) void 0;
 }
 
 // ฟังก์ชันจัดการการคลิก link ระดับย่อยแรกของ Desktop (ที่เป็น link โดยตรง ไม่มี children)
 function handleDesktopSubLinkClick(parentItem: NavigationItemType): void {
   closeAllDesktopDropdowns();
   // Vue Router จะจัดการ navigation
+  if (parentItem) void 0;
 }
 
 // ฟังก์ชันจัดการการคลิก link ระดับย่อยที่สองของ Desktop
 function handleDesktopGrandSubLinkClick(grandParentItem: NavigationItemType, parentItem: NavigationItemType): void {
   closeAllDesktopDropdowns();
   // Vue Router จะจัดการ navigation
+  if (grandParentItem || parentItem) void 0;
 }
 
 // --- Event Handlers for events from HeaderNavigationItem ---
